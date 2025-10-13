@@ -1,0 +1,3 @@
+[submodule "libbthread"]
+	path = libbthread
+	url = https://github.com/tbgitoo/libbthread
