@@ -38,7 +38,7 @@ int ITC_ip1q::get_event (unsigned int emask)
 }
 
 
-int ITC_ip1q::get_event_nowait (unsigned int emask)
+[[maybe_unused]] int ITC_ip1q::get_event_nowait (unsigned int emask)
 {
     int e; 
 

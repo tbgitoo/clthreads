@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------------------
 //
 //  Copyright (C) 2003-2008 Fons Adriaensen <fons@kokkinizita.net>
-//    
+//
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU Lesser General Public License as published
 //  by the Free Software Foundation; either version 2 of the License, or
@@ -19,15 +19,16 @@
 // ---------------------------------------------------------------------------------
 
 
-#include "clthreads.h"
+#include <android/log.h>
+#include "include/clthreads.h"
 
 
-P_thread::P_thread (void) :  _ident (0)
+P_thread::P_thread () :  _ident (0)
 {
 }
 
 
-P_thread::~P_thread (void)
+P_thread::~P_thread ()
 {
 }
 
@@ -42,13 +43,14 @@ extern "C" void *P_thread_entry_point (void *arg)
 
 int P_thread::thr_start (int policy, int priority, size_t stacksize)
 {
+
     int                min, max, rc;
     pthread_attr_t     attr;
     struct sched_param parm;
 
     min = sched_get_priority_min (policy);
     max = sched_get_priority_max (policy);
-    priority += max;
+    //priority += max;
     if (priority > max) priority = max;
     if (priority < min) priority = min;
     parm.sched_priority = priority;
@@ -61,11 +63,11 @@ int P_thread::thr_start (int policy, int priority, size_t stacksize)
     pthread_attr_setinheritsched (&attr, PTHREAD_EXPLICIT_SCHED);
     pthread_attr_setstacksize (&attr, stacksize);
 
-    _ident = 0; 
+    _ident = 0;
     rc = pthread_create (&_ident,
-			 &attr,
-			 P_thread_entry_point,
-			 this);
+                         &attr,
+                         P_thread_entry_point,
+                         this);
 
     pthread_attr_destroy (&attr);
 
@@ -73,7 +75,4 @@ int P_thread::thr_start (int policy, int priority, size_t stacksize)
 }
 
 
-void P_thread::thr_main (void)
-{
-}
 

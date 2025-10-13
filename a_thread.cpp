@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------------------
 //
 //  Copyright (C) 2003-2008 Fons Adriaensen <fons@kokkinizita.net>
-//    
+//
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU Lesser General Public License as published
 //  by the Free Software Foundation; either version 2 of the License, or
@@ -19,10 +19,10 @@
 // ---------------------------------------------------------------------------------
 
 
-#include <stdarg.h>
-#include <string.h>
-#include <ctype.h>
-#include "clthreads.h"
+#include <cstdarg>
+#include <cstring>
+#include <cctype>
+#include "include/clthreads.h"
 
 
 unsigned long A_thread::_trace = 0;
@@ -41,7 +41,7 @@ A_thread::A_thread (const char *name) :  _inst (0)
 
 void A_thread::mprintf (int opid, const char *fmt, ...)
 {
-    Textmsg *M = new Textmsg (1024);
+    auto *M = new Textmsg (1024);
 
     va_list ap;
     va_start (ap, fmt);

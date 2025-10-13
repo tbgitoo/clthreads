@@ -165,7 +165,7 @@ void ITC_ctrl::connect (ITC_ctrl *srce, unsigned int opid,
     assert (opid < N_OP);
     assert (ipid < N_MQ + N_EC);
 
-    srce->_dest [opid] = 0;
+    srce->_dest [opid] = nullptr;
     srce->_ipid [opid] = ipid;
     srce->_dest [opid] = dest;
 }
