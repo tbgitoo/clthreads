@@ -1,6 +1,8 @@
-To make and install the library, cd to this directory, su root,
-and 'make install'. This will install the lib and header file in
-/usr/local/lib and /usr/local/include.
+This library is intended to be used with Android Studio for Android applications. For the general C++ library, please refer to https://github.com/dmeliza/clthreads.
 
-To install to other directories, see the Makefile.
+For usage in Android studio, this library is intended to be used via the CMakeLists.txt mechanism (i.e. using the CMake version which comes as 
+integral part of Android Studio). In general, source C++ libraries such as this one are included in Android Studio via inclusion in the 
+CMakeLists.txt files. At the very minimum, you'll need to have an "add_subdirectory(clthreads)" directive somewhere in your CMakeLists.txt file hierarchy, and since you will probably want to use some functionality of this clthreads library, you'll also need to link the library in one of your target_link_libraries directives. Possibly you'll need to include header file search paths on occasions as well.
+
+The intend of this library is that it get's compiled along with your other source code and ultimately linked to one or more of your native C libraries. When used as intended, the clthreads library will span linux threads in Android and enable asynchronous inter-thread communication.
 
