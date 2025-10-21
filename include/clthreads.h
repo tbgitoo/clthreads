@@ -635,7 +635,7 @@ public:
      * Read the present time stamp
      * @param t Pointer to timespec structure that will be filled to return the present time stamp
      */
-    void get_time (timespec *t) { t->tv_sec = _time.tv_sec; t->tv_nsec = _time.tv_nsec; }
+    [[maybe_unused]] void get_time (timespec *t) const { t->tv_sec = _time.tv_sec; t->tv_nsec = _time.tv_nsec; }
     /**
      * Increment present time stamp
      * @param micros Microseconds to add to time stamp
@@ -701,7 +701,7 @@ inline int ITC_ctrl::put_event_try (unsigned int evid, unsigned int incr)
     if ((evid >= N_MQ) && (evid < N_MQ + N_EC))
     {
         _ecnt [evid - N_MQ] += incr;
-        eput (evid);
+        eput ((int)evid);
     }
     else  r = BAD_PORT;
     unlock ();
@@ -717,7 +717,7 @@ inline int ITC_ctrl::put_event (unsigned int evid, unsigned int incr)
     if ((evid >= N_MQ) && (evid < N_MQ + N_EC))
     {
         _ecnt [evid - N_MQ] += incr;
-        eput (evid);
+        eput ((int)evid);
     }
     else  r = BAD_PORT;
     unlock ();
@@ -733,7 +733,7 @@ inline int ITC_ctrl::put_event (unsigned int evid, ITC_mesg *M)
     if (evid < N_MQ)
     {
         _list [evid].put (M);
-        eput (evid);
+        eput ((int)evid);
     }
     else r = BAD_PORT;
     unlock ();
@@ -783,7 +783,7 @@ public:
     P_thread (const P_thread&);
     P_thread& operator=(const P_thread&);
 
-    void sepuku () { pthread_cancel (_ident); }
+    [[maybe_unused]] void sepuku () { pthread_cancel (_ident); } // NOLINT(*-make-member-function-const)
 
     /**
      * Main thread loop, override in daughter classes to do something useful
@@ -797,7 +797,9 @@ public:
      * @param stacksize Thread stack size. If you don't have specific reasons, provide 0
      * @return
      */
-    virtual int  thr_start (int policy, int priority, size_t stacksize = 0);
+    virtual int  thr_start (int policy, int priority, size_t stacksize);
+
+    [[maybe_unused]] virtual int  thr_start (int policy, int priority) {return thr_start(policy,priority,0);};
 
 private:
 
