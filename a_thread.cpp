@@ -35,7 +35,7 @@ A_thread::A_thread (const char *name) :  _inst (0)
     strncpy (_name, name, 32);
     _name [31] = 0;
     for (p = name; *p && !isdigit (*p); p++);
-    if (*p) _inst = atoi (p);
+    if (*p) _inst = atoi(p); // NOLINT(*-err34-c)
 }
 
 
@@ -49,4 +49,6 @@ void A_thread::mprintf (int opid, const char *fmt, ...)
     va_end (ap);
     send_event (opid, M);
 }
+
+
 

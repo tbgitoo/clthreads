@@ -54,7 +54,7 @@ public:
 
 private:
 
-    sem_t  _sema;
+    sem_t  _sema{};
 };
 
 /**
@@ -64,20 +64,20 @@ class Bmutex
 {
 public:
 
-    Bmutex (void) { if (pthread_mutex_init (&_mutex, 0)) abort (); }
-    ~Bmutex (void) { pthread_mutex_destroy (&_mutex); }
+    Bmutex () { if (pthread_mutex_init (&_mutex, nullptr)) abort (); }
+    ~Bmutex () { pthread_mutex_destroy (&_mutex); }
     Bmutex (const Bmutex&);
     Bmutex& operator= (const Bmutex&);
 
-    void lock (void) { if (pthread_mutex_lock (&_mutex)) abort (); }
-    void unlock (void){ if (pthread_mutex_unlock (&_mutex)) abort (); }
-    int trylock (void) { return pthread_mutex_trylock (&_mutex); }
+    void lock () { if (pthread_mutex_lock (&_mutex)) abort (); }
+    void unlock (){ if (pthread_mutex_unlock (&_mutex)) abort (); }
+    int trylock () { return pthread_mutex_trylock (&_mutex); }
 
 private:
 
     friend class Esync;
 
-    pthread_mutex_t  _mutex;
+    pthread_mutex_t  _mutex{};
 };
 
 
@@ -102,18 +102,18 @@ public:
 
     Cmutex& operator= (const Cmutex&);
 
-    void lock (void);
-    void unlock (void);
+    void lock ();
+    void unlock ();
 
 private:
 
-    pthread_mutex_t   _mutex;
+    pthread_mutex_t   _mutex{};
     pthread_t         _owner; // Thread ID of the current owner (0 if unlocked)
     int               _count; // Number of times the current owner has locked this mutex
 };
 
 
-inline void Cmutex::lock (void)
+inline void Cmutex::lock ()
 {
     if (_owner == pthread_self ()) ++_count;
     else
@@ -124,7 +124,7 @@ inline void Cmutex::lock (void)
     }
 }
 
-inline void Cmutex::unlock (void)
+inline void Cmutex::unlock ()
 {
     if (_owner == pthread_self ())
     {
@@ -151,8 +151,8 @@ public:
         EV_ERROR = -2
     };
 
-    Esync (void) : _event (EV_ERROR), _emask (0) { if (pthread_cond_init (&_cond, 0)) abort (); }
-    ~Esync (void) { pthread_cond_destroy (&_cond); }
+    Esync () : _event (EV_ERROR), _emask (0) { if (pthread_cond_init (&_cond, 0)) abort (); }
+    ~Esync () { pthread_cond_destroy (&_cond); }
     Esync (const Esync&);
     Esync& operator= (const Esync&);
 
@@ -173,7 +173,7 @@ private:
 
     volatile int     _event; // last event
     unsigned int     _emask; // mask
-    pthread_cond_t   _cond;
+    pthread_cond_t   _cond{};
 };
 
 
@@ -837,8 +837,8 @@ class A_thread : public P_thread, public ITC_ctrl
 {
 public:
 
-    A_thread (const char *name);
-    virtual ~A_thread (void) {};
+    explicit A_thread (const char *name);
+    ~A_thread () override =default;
     A_thread (const A_thread&);
     A_thread& operator=(const A_thread&);
 
@@ -857,7 +857,7 @@ public:
 
 private:
 
-    char    _name [32];
+    char    _name [32]={0};
     int     _inst;
 };
 
