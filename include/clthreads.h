@@ -684,11 +684,11 @@ private:
     [[nodiscard]] int find_event (unsigned int emask) const;
 
     ITC_list        _list [N_MQ]; // input message queues for different input ids
-    unsigned int    _ecnt [N_EC]; // counter for simple (non-ITC_msg) type events
+    unsigned int    _ecnt [N_EC]{}; // counter for simple (non-ITC_msg) type events
     ITC_mesg       *_mptr; // Pointer to last message found
-    timespec        _time; // Timeout to wait for messages via get_event_timed
-    Edest          *_dest [N_OP]; // destinations for sending messages
-    int             _ipid [N_OP]; // input ids to be transmitted to the destination along with the message
+    timespec        _time{}; // Timeout to wait for messages via get_event_timed
+    Edest          *_dest [N_OP]{nullptr}; // destinations for sending messages
+    int             _ipid [N_OP]{}; // input ids to be transmitted to the destination along with the message
 
 };
 
@@ -815,12 +815,12 @@ class H_thread : public P_thread, public ITC_ip1q
 public:
 
     H_thread (Edest *dest, int ipid) : _dest (dest), _ipid (ipid) {}
-    virtual ~H_thread (void) {};
+    ~H_thread () override = default;
     H_thread (const H_thread&);
     H_thread& operator=(const H_thread&);
 
     void reply (ITC_mesg *M) { _dest->put_event (_ipid, M); }
-    void reply (void) { _dest->put_event (_ipid, 1); }
+    void reply () { _dest->put_event (_ipid, 1); }
 
 private:
 
@@ -852,7 +852,7 @@ public:
     * Returns the unique instance number assigned to this thread,
     * useful for distinguishing between multiple threads of the same type.
     */
-    int inst () { return _inst; }
+    [[maybe_unused]] [[nodiscard]] int inst () const { return _inst; }
     const char *name () { return _name; }
 
     static unsigned long _trace;
@@ -876,31 +876,31 @@ public:
         ITM_CLLIB_TEXT = ITM_CLLIB_BASE + 1
     };
 
-    Textmsg (size_t size);
-    ~Textmsg (void) { delete _text; _counter--; }
+    explicit Textmsg (size_t size);
+    ~Textmsg () override { delete _text; _counter--; }
     Textmsg (const Textmsg&);
     Textmsg& operator= (const Textmsg&);
 
-    char *text (void) const { return _text; }
-    size_t size (void) const { return _size; }
-    size_t strlen (void) const { return _strlen; }
-    int count (void) const { return _count; }
+    [[nodiscard]] char *text () const { return _text; }
+    [[nodiscard]] size_t size () const { return _size; }
+    [[nodiscard]] size_t strlen () const { return _strlen; }
+    [[nodiscard]] int count () const { return _count; }
 
-    virtual void recover (void) { delete this; }
+    void recover () override { delete this; }
 
     int set_count (int k) { return _count = k; }
-    int inc_count (void) { return ++_count; }
-    int dec_count (void) { return --_count; }
-    void reset (void) { _strlen = 0; _count = 0; _lp = 0; _lc = 0; }
+    int inc_count () { return ++_count; }
+    int dec_count () { return --_count; }
+    void reset () { _strlen = 0; _count = 0; _lp = nullptr; _lc = 0; }
 
     void vprintf (const char *fmt, va_list ap);
     void printf (const char *fmt, ...);
 
-    const char *getword (void);
-    const char *gettail (void);
-    void restore (void);
+    const char *getword ();
+    const char *gettail ();
+    void restore ();
 
-    static size_t object_counter (void) { return _counter; }
+    static size_t object_counter () { return _counter; }
 
 private:
 

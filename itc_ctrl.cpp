@@ -26,20 +26,20 @@
 #include "clthreads.h"
 
 
-ITC_ctrl::ITC_ctrl (void) : _mptr (0)
+ITC_ctrl::ITC_ctrl () : _mptr (0)
 {
     for (int i = 0; i < N_OP; i++)
     {
-	_dest [i] = 0;
+	_dest [i] = nullptr;
 	_ipid [i] = 0;
     }
-    for (int i = 0; i < N_EC; i++) _ecnt [i] = 0; 
+    for (unsigned int & i : _ecnt) i = 0;
     _time.tv_sec  = 0;
     _time.tv_nsec = 0;
 }
 
 
-ITC_ctrl::~ITC_ctrl (void)
+ITC_ctrl::~ITC_ctrl ()
 {
 }
 
