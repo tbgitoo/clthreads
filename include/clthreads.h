@@ -857,7 +857,7 @@ public:
 
 private:
 
-    char    _name [32];
+    char    _name [32]{};
     int     _inst;
 };
 
