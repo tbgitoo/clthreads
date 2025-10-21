@@ -94,7 +94,7 @@ class Cmutex
 {
 public:
 
-    Cmutex () : _owner (0), _count (0) { if (pthread_mutex_init (&_mutex, 0)) abort (); }
+    Cmutex () : _owner (0), _count (0) { if (pthread_mutex_init (&_mutex, nullptr)) abort (); }
     ~Cmutex () { pthread_mutex_destroy (&_mutex); }
     // Copy constructor and assignment operator are declared but not defined
     // This prevents copying of mutex objects (mutexes should not be copied)
@@ -151,7 +151,7 @@ public:
         EV_ERROR = -2
     };
 
-    Esync () : _event (EV_ERROR), _emask (0) { if (pthread_cond_init (&_cond, 0)) abort (); }
+    Esync () : _event (EV_ERROR), _emask (0) { if (pthread_cond_init (&_cond, nullptr)) abort (); }
     ~Esync () { pthread_cond_destroy (&_cond); }
     Esync (const Esync&);
     Esync& operator= (const Esync&);
@@ -230,9 +230,9 @@ public:
     /** Destroy this message, freeing memory */
     virtual void recover () { delete this; }
     /** Pointer to the next message in the message list */
-    ITC_mesg *forw (void) const { return _forw; }
+    [[nodiscard]] ITC_mesg *forw () const { return _forw; }
      /** Pointer to the previous message in the message list */
-    ITC_mesg *back (void) const { return _back; }
+    [[nodiscard]] ITC_mesg *back () const { return _back; }
     /** Numerical code for message type */
     [[nodiscard]] unsigned long  type () const { return _type; }
 
@@ -279,11 +279,11 @@ public:
     // Remove specific message from anywhere in list
     void rem (ITC_mesg *p);
     // Remove all messages and call recover() on each
-    void flush (void);
-    ITC_mesg *head (void) const { return _head; }
-    ITC_mesg *tail (void) const { return _tail; }
+    void flush ();
+    [[nodiscard]] ITC_mesg *head () const { return _head; }
+    [[nodiscard]] ITC_mesg *tail () const { return _tail; }
 
-    int count (void) const { return _count; }
+    [[nodiscard]] int count () const { return _count; }
 
 private:
 
@@ -368,8 +368,8 @@ public:
         BAD_PORT  = 3
     };
 
-    Edest () {}
-    virtual ~Edest () {}
+    Edest ()=default;
+    virtual ~Edest ()=default;
     Edest (const Edest&);
     Edest& operator= (const Edest&);
 
@@ -416,7 +416,7 @@ public:
     enum {  N_BE = 31,  N_MQ =  1,  EM_ALL = ~0 };
 
     ITC_ip1q () : _bits (0), _mptr (nullptr) {};
-    ~ITC_ip1q () {};
+    ~ITC_ip1q () override=default;
     ITC_ip1q (const ITC_ip1q&);
     ITC_ip1q& operator= (const ITC_ip1q&);
 
@@ -479,7 +479,7 @@ private:
      * @param mask Binary mask for event search
      * @return top priority event (highest bits present while matching mask)
      */
-    int find_event (unsigned int mask) const;
+    [[nodiscard]] int find_event (unsigned int mask) const;
 
     unsigned int  _bits;
     ITC_list      _list;
@@ -495,7 +495,7 @@ inline int ITC_ip1q::put_event (unsigned int evid, unsigned int incr)
     if ((evid >= N_MQ) && (evid < N_MQ + N_BE))
     {
         _bits |= 1 << evid;
-        eput (evid);
+        eput ((int)evid);
     }
     else  r = BAD_PORT;
     unlock ();
@@ -511,7 +511,7 @@ inline int ITC_ip1q::put_event (unsigned int evid, ITC_mesg *M)
     if (evid < N_MQ)
     {
         _list.put (M);
-        eput (evid);
+        eput ((int)evid);
     }
     else r = BAD_PORT;
     unlock ();
@@ -526,8 +526,8 @@ inline int ITC_ip1q::put_event_try (unsigned int evid, unsigned int incr)
     if (trylock ()) return DST_LOCK;
     if ((evid >= N_MQ) && (evid < N_MQ + N_BE))
     {
-        _bits |= 1 << evid;
-        eput (evid);
+        _bits |= ((unsigned int)1) << evid;
+        eput ((int)evid);
     }
     else  r = BAD_PORT;
     unlock ();
@@ -578,7 +578,7 @@ public:
     };
 
     ITC_ctrl ();
-    ~ITC_ctrl ();
+    ~ITC_ctrl () override;
     ITC_ctrl (const ITC_ctrl&);
     ITC_ctrl& operator= (const ITC_ctrl&);
 
