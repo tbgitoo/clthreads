@@ -26,7 +26,7 @@
 #include "clthreads.h"
 
 
-ITC_ctrl::ITC_ctrl () : _mptr (0)
+ITC_ctrl::ITC_ctrl () : _mptr (nullptr)
 {
     for (int i = 0; i < N_OP; i++)
     {
@@ -38,10 +38,6 @@ ITC_ctrl::ITC_ctrl () : _mptr (0)
     _time.tv_nsec = 0;
 }
 
-
-ITC_ctrl::~ITC_ctrl ()
-{
-}
 
 
 void ITC_ctrl::set_time (const timespec *v)
@@ -59,7 +55,7 @@ void ITC_ctrl::set_time (const timespec *v)
 	_time.tv_sec  = t.tv_sec;
 	_time.tv_nsec = t.tv_usec * 1000;
 #else
-	timespec t;
+	timespec t{};
 	clock_gettime (CLOCK_REALTIME, &t);
 	_time.tv_sec  = t.tv_sec;
 	_time.tv_nsec = t.tv_nsec;
@@ -74,17 +70,17 @@ void ITC_ctrl::inc_time (unsigned long micros)
 
     s = micros / 1000000;
     m = micros % 1000000;
-    _time.tv_nsec += 1000 * m;
+    _time.tv_nsec += (long)(1000 * m);
     if (_time.tv_nsec >= 1000000000)
     {
 	_time.tv_nsec -= 1000000000;
 	s += 1;
     }
-    _time.tv_sec += s;
+    _time.tv_sec += (time_t)s;
 }
 
 
-unsigned long ITC_ctrl::delay (void)
+unsigned long ITC_ctrl::delay () const
 {
 #ifdef __APPLE__
     struct timeval t;
@@ -92,7 +88,7 @@ unsigned long ITC_ctrl::delay (void)
     gettimeofday (&t, 0);
     return  t.tv_usec - _time.tv_nsec / 1000 + 1000000 * (t.tv_sec - _time.tv_sec);
 #else
-    timespec t;
+    timespec t{};
 
     clock_gettime (CLOCK_REALTIME, &t);
     return  (t.tv_nsec - _time.tv_nsec) / 1000 + 1000000 * (t.tv_sec - _time.tv_sec);
@@ -105,7 +101,7 @@ int ITC_ctrl::get_event (unsigned int emask)
     int e;
 
     lock ();
-    _mptr = 0;
+    _mptr = nullptr;
     e = find_event (emask);
     if (e < 0) e = eget (emask);
     if      (e >= N_MQ) _ecnt [e - N_MQ] -= 1;
@@ -120,7 +116,7 @@ int ITC_ctrl::get_event_timed (unsigned int emask)
     int e;
   
     lock ();
-    _mptr = 0;
+    _mptr = nullptr;
     e = find_event (emask);
     if (e < 0) e = eget (emask, &_time);
     if      (e >= N_MQ) _ecnt [e - N_MQ] -= 1;
@@ -135,7 +131,7 @@ int ITC_ctrl::get_event_nowait (unsigned int emask)
     int e; 
 
     if (trylock ()) return EV_TIME;
-    _mptr = 0;
+    _mptr = nullptr;
     e = find_event (emask);
     if      (e >= N_MQ) _ecnt [e - N_MQ] -= 1;
     else if (e >= 0)    _mptr = _list [e].get ();
@@ -166,7 +162,7 @@ void ITC_ctrl::connect (ITC_ctrl *srce, unsigned int opid,
     assert (ipid < N_MQ + N_EC);
 
     srce->_dest [opid] = nullptr;
-    srce->_ipid [opid] = ipid;
+    srce->_ipid [opid] = (int)ipid;
     srce->_dest [opid] = dest;
 }
 

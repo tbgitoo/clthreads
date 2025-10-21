@@ -28,16 +28,14 @@ P_thread::P_thread () :  _ident (0)
 }
 
 
-P_thread::~P_thread ()
-{
-}
+
 
 
 extern "C" void *P_thread_entry_point (void *arg)
 {
-    P_thread *T = (P_thread *) arg;
+    auto *T = (P_thread *) arg;
     T->thr_main ();
-    return NULL;
+    return nullptr;
 }
 
 
@@ -46,7 +44,7 @@ int P_thread::thr_start (int policy, int priority, size_t stacksize)
 
     int                min, max, rc;
     pthread_attr_t     attr;
-    struct sched_param parm;
+    struct sched_param parm{};
 
     min = sched_get_priority_min (policy);
     max = sched_get_priority_max (policy);

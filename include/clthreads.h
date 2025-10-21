@@ -578,7 +578,7 @@ public:
     };
 
     ITC_ctrl ();
-    ~ITC_ctrl () override;
+    ~ITC_ctrl () override=default;
     ITC_ctrl (const ITC_ctrl&);
     ITC_ctrl& operator= (const ITC_ctrl&);
 
@@ -645,7 +645,7 @@ public:
      * How long ago is the present time stamp compared to processor time?
      * @return In microseconds, how far is the present processor time ahead of the set time stamp
      */
-    unsigned long delay ();
+    unsigned long delay () const;
 
     int  put_event (unsigned int evid, ITC_mesg *M) override;
     int  put_event (unsigned int evid, unsigned int incr) override;
@@ -779,7 +779,7 @@ class P_thread
 public:
 
     P_thread ();
-    virtual ~P_thread ();
+    virtual ~P_thread ()=default;
     P_thread (const P_thread&);
     P_thread& operator=(const P_thread&);
 

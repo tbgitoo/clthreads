@@ -27,7 +27,7 @@ int ITC_ip1q::get_event (unsigned int emask)
     int e;
 
     lock ();
-    _mptr = 0;
+    _mptr = nullptr;
     e = find_event (emask);
     if (e < 0) e = eget (emask);
     if (e >= N_MQ) _bits &= ~(1 << e);
@@ -43,7 +43,7 @@ int ITC_ip1q::get_event (unsigned int emask)
     int e; 
 
     if (trylock ()) return EV_TIME;
-    _mptr = 0;
+    _mptr = nullptr;
     e = find_event (emask);
     if (e >= N_MQ) _bits &= ~(1 << e);
     else if (e == 0) _mptr = _list.get ();
